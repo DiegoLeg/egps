@@ -1,14 +1,6 @@
 import sys
 from PyQt4 import QtGui
-
-# from PyQt4.QtGui import QSound
 import audio_module
-
-
-# import audio_handling2
-
-
-# import scipy.io.wavfile as wav
 
 
 class Window(QtGui.QMainWindow):
@@ -17,8 +9,7 @@ class Window(QtGui.QMainWindow):
 
         super(Window, self).__init__()  # parent
         self.setGeometry(70, 70, 780, 500)
-        self.setWindowTitle("Test#3")
-        # self.setWindowIcon (QtGui.QIcon("asd.png")) solo para el icono de la ventana
+        self.setWindowTitle("EGPS-1")
 
         extractAction = QtGui.QAction("&Salir", self)  # Nombre de el submenu representativo de lo que quiero que haga
         extractAction.setShortcut("Ctrl+Q")  # shortcut
@@ -31,9 +22,9 @@ class Window(QtGui.QMainWindow):
         openFile.setStatusTip('Abrir Archivo')  # lo que va a decir en la status bar cuando pase el mouse por ahi
         openFile.triggered.connect(self.file_open)
 
-        saveFile = QtGui.QAction("Guardar como...", self)  # creo abrir un archivo, con el label abrir
+        saveFile = QtGui.QAction("Guardar como...", self)
         saveFile.setShortcut("Ctrl+S")
-        saveFile.setStatusTip('Guardar Archivo')  # lo que va a decir en la status bar cuando pase el mouse por ahi
+        saveFile.setStatusTip('Guardar Archivo')
         saveFile.triggered.connect(self.file_save)
 
         self.statusBar()  # do not touch
@@ -44,14 +35,9 @@ class Window(QtGui.QMainWindow):
         fileMenu.addAction(saveFile)
         fileMenu.addAction(extractAction)
 
-        self.home()  # en lugar de show, defino home mas abajo
+        self.home()                                             # en lugar de show, defino home mas abajo
 
     def home(self):
-
-        # btn = QtGui.QPushButton("Salir", self)
-        # btn.clicked.connect (self.close_application)            #que es lo que hace el boton una vez que lo apreto.
-        # btn.resize(btn.minimumSizeHint())
-        # btn.move(0,100)
 
         label1 = QtGui.QLabel("Transductor de entrada", self)
         label1.move(80, 60)
@@ -61,36 +47,33 @@ class Window(QtGui.QMainWindow):
         label2.move(500, 60)
         label2.resize(label1.minimumSizeHint())
 
-        # checkBox = QtGui.QCheckBox ("Maximizar",self)           #nombre
-        # checkBox.move (300,50)                                  #muevo un toque de lugar el checkbox
-        # checkBox.stateChanged.connect (self.enlarge_window)     #que es lo que hace. Tengo que definir enlarge window ademas
 
-        self.progress = QtGui.QProgressBar(self)  # hago un progress bar
-        self.progress.setGeometry(250, 410, 250, 20)  # dimensiones del progress bar
+        self.progress = QtGui.QProgressBar(self)                # hago un progress bar
+        self.progress.setGeometry(250, 410, 250, 20)            # dimensiones del progress bar
 
-        self.btn = QtGui.QPushButton("Procesar", self)  # hago un push button que activa el progress bar
-        self.btn.move(304, 350)  # donde va ubicado el boton
-        self.btn.clicked.connect(self.download)  # que es lo que hace el boton. Tengo que definir un metodo download
+        self.btn = QtGui.QPushButton("Procesar", self)      # hago un push button que activa el progress bar
+        self.btn.move(304, 350)                             # donde va ubicado el boton
+        self.btn.clicked.connect(self.process)              # que es lo que hace el boton. Tengo que definir un metodo download
 
-        self.btn2 = QtGui.QPushButton("REC", self)  # hago un push button que activa el progress bar
-        self.btn2.move(254, 190)  # donde va ubicado el boton
+        self.btn2 = QtGui.QPushButton("REC", self)
+        self.btn2.move(254, 190)
         self.btn2.setIcon(QtGui.QIcon('rec.png'))
-        self.btn2.clicked.connect(self.rec)  # que es lo que hace el boton. Tengo que definir un metodo download
+        self.btn2.clicked.connect(self.rec)
 
-        self.btn3 = QtGui.QPushButton("STOP", self)  # hago un push button que activa el progress bar
-        self.btn3.move(354, 190)  # donde va ubicado el boton
+        self.btn3 = QtGui.QPushButton("STOP", self)
+        self.btn3.move(354, 190)
         self.btn3.setIcon(QtGui.QIcon('stop.png'))
-        self.btn3.clicked.connect(self.stop)  # que es lo que hace el boton. Tengo que definir un metodo download
+        self.btn3.clicked.connect(self.stop)
 
-        self.btn4 = QtGui.QPushButton("NEW", self)  # hago un push button que activa el progress bar
-        self.btn4.move(304, 140)  # donde va ubicado el boton
+        self.btn4 = QtGui.QPushButton("NEW", self)
+        self.btn4.move(304, 140)
         self.btn4.setIcon(QtGui.QIcon('new.png'))
-        self.btn4.clicked.connect(self.download)  # que es lo que hace el boton. Tengo que definir un metodo download
+        self.btn4.clicked.connect(self.download)
 
-        self.btn5 = QtGui.QPushButton("PLAY", self)  # hago un push button que activa el progress bar
-        self.btn5.move(304, 240)  # donde va ubicado el boton
+        self.btn5 = QtGui.QPushButton("PLAY", self)
+        self.btn5.move(304, 240)
         self.btn5.setIcon(QtGui.QIcon('play.png'))
-        self.btn5.clicked.connect(self.play)  # que es lo que hace el boton. Tengo que definir un metodo download
+        self.btn5.clicked.connect(self.play)
 
         # --------------------------------------------------------------------------------
 
@@ -102,27 +85,27 @@ class Window(QtGui.QMainWindow):
 
         radioButton2 = QtGui.QRadioButton("MCF", self)
         radioButton2.move(100, 130)
-        radioButton2.toggled.connect(self.buttonClicked)  # accion del radiobutton
+        radioButton2.toggled.connect(self.buttonClicked)
 
         radioButton3 = QtGui.QRadioButton("MVF", self)
         radioButton3.move(100, 170)
-        radioButton3.toggled.connect(self.buttonClicked)  # accion del radiobutton
+        radioButton3.toggled.connect(self.buttonClicked)
 
         radioButton4 = QtGui.QRadioButton("MNF", self)
         radioButton4.move(100, 210)
-        radioButton4.toggled.connect(self.buttonClicked)  # accion del radiobutton
+        radioButton4.toggled.connect(self.buttonClicked)
 
         radioButton5 = QtGui.QRadioButton("MRF", self)
         radioButton5.move(100, 250)
-        radioButton5.toggled.connect(self.buttonClicked)  # accion del radiobutton
+        radioButton5.toggled.connect(self.buttonClicked)
 
         radioButton6 = QtGui.QRadioButton("MT-N", self)
         radioButton6.move(100, 290)
-        radioButton6.toggled.connect(self.buttonClicked)  # accion del radiobutton
+        radioButton6.toggled.connect(self.buttonClicked)
 
         radioButton7 = QtGui.QRadioButton("MT-B", self)
         radioButton7.move(100, 330)
-        radioButton7.toggled.connect(self.buttonClicked)  # accion del radiobutton
+        radioButton7.toggled.connect(self.buttonClicked)
 
         # ----------------------------------------------------------------------------------
 
@@ -163,7 +146,7 @@ class Window(QtGui.QMainWindow):
         self.play_Maf.move(570, 86)
         self.play_Maf.setIcon(QtGui.QIcon('play.png'))
         self.play_Maf.resize(self.play_Maf.minimumSizeHint())
-        self.play_Maf.clicked.connect(self.download)
+        self.play_Maf.clicked.connect(self.play)
 
         self.play_Mcf = QtGui.QPushButton("", self)
         self.play_Mcf.move(570, 126)
@@ -298,21 +281,16 @@ class Window(QtGui.QMainWindow):
 
     # Defino los metodos que uso
 
-    def download(self):  # defino el boton descargar
-        self.completed = 0  # punto de partida del progress bar
+    def download(self):                                 #defino el boton descargar
+        self.completed = 0                              #punto de partida del progress bar
         while self.completed < 100:
-            self.completed += 0.001  # le voy sumando de a estos pasos redefiniendo self.completed
-            self.progress.setValue(self.completed)  # seteo el valor como el de self.completed
+            self.completed += 0.001                     # le voy sumando de a estos pasos redefiniendo self.completed
+            self.progress.setValue(self.completed)      # seteo el valor como el de self.completed
 
     def file_open(self):
         name = QtGui.QFileDialog.getOpenFileName(self, 'Abrir Archivo')
         file = open(name, 'r')
 
-        # self.editor()                      #Como quiero que abra o guarde el archivo
-
-        # with file:
-        #    text = file.read()
-        #    self.textEdit.setText(text)
 
     def file_save(self):
         name = QtGui.QFileDialog.getSaveFileName(self, 'Guardar Archivo')
@@ -328,13 +306,11 @@ class Window(QtGui.QMainWindow):
         else:
             pass
 
-    def closeEvent(self,
-                   event):  # defino este nuevo metodo para que aparezca el popup tambien si hago clic en la cruz roja
+    def closeEvent(self, event):        # defino este nuevo metodo para que aparezca el popup tambien si hago clic en la cruz roja
         event.ignore()
         self.close_application()
 
-    def radio_action(self,
-                     pressed):  # defino este nuevo metodo para que el radio button haga una cosa u otra segun si esta apretado o no
+    def radio_action(self,pressed):      # defino este nuevo metodo para que el radio button haga una cosa u otra segun si esta apretado o no
 
         if pressed:
             print ("down")
@@ -356,6 +332,12 @@ class Window(QtGui.QMainWindow):
         AudioModule = audio_module.AudioModule()
         AudioModule.stop()
 
+    def process(self):
+        AudioModule = audio_module.AudioModule()
+        AudioModule.process()
+    #---------------------------------------------------------------------------
+
+
     # ---------------------------------------------------------------------------
     # Defino que quiero que haga cada radiobutton
 
@@ -367,6 +349,7 @@ class Window(QtGui.QMainWindow):
         # print a
         if a == ("MAF"):
             print ("1")  # aca iria lo que quiero que haga una vez presiono en MAF
+            #process(MAF)
         elif a == ("MCF"):
             print ("2")
         elif a == ("MVF"):
@@ -382,7 +365,8 @@ class Window(QtGui.QMainWindow):
         else:
             print ("DAH")
 
-            # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 
 
 def run():  # defino un metodo run para que corra la app
