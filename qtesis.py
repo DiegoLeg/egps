@@ -2,25 +2,19 @@ import sys
 from PyQt4 import QtGui
 import audio_module
 
-
 class Window(QtGui.QMainWindow):
 
     def __init__(self):
 
-        super(Window, self).__init__()  # parent
+        super(Window, self).__init__()                  # parent
         self.setGeometry(70, 70, 780, 500)
         self.setWindowTitle("EGPS-1")
 
-        extractAction = QtGui.QAction("&Salir", self)  # Nombre de el submenu representativo de lo que quiero que haga
+        extractAction = QtGui.QAction("&Salir", self)  # Nombre del submenu representativo de lo que quiero que haga
         extractAction.setShortcut("Ctrl+Q")  # shortcut
         extractAction.setStatusTip("Salir de la app")
         extractAction.triggered.connect(
-            self.close_application)  # lo que quiero que haga ese submenu cuando le haga clic, cerrar la app
-
-        openFile = QtGui.QAction("Abrir", self)  # creo abrir un archivo, con el label abrir
-        openFile.setShortcut("Ctrl+O")
-        openFile.setStatusTip('Abrir Archivo')  # lo que va a decir en la status bar cuando pase el mouse por ahi
-        openFile.triggered.connect(self.file_open)
+        self.close_application)                         # lo que quiero que haga ese submenu cuando le haga clic, cerrar la app
 
         saveFile = QtGui.QAction("Guardar como...", self)
         saveFile.setShortcut("Ctrl+S")
@@ -30,12 +24,11 @@ class Window(QtGui.QMainWindow):
         self.statusBar()  # do not touch
 
         mainMenu = self.menuBar()
-        fileMenu = mainMenu.addMenu('&Archivo')  # name of the menu
-        fileMenu.addAction(openFile)  # acciones que le agrego al menu
+        fileMenu = mainMenu.addMenu('&Archivo')                 #Nombre del menu
         fileMenu.addAction(saveFile)
         fileMenu.addAction(extractAction)
 
-        self.home()                                             # en lugar de show, defino home mas abajo
+        self.home()                                             #Defino home mas abajo
 
     def home(self):
 
@@ -51,9 +44,9 @@ class Window(QtGui.QMainWindow):
         self.progress = QtGui.QProgressBar(self)                # hago un progress bar
         self.progress.setGeometry(250, 410, 250, 20)            # dimensiones del progress bar
 
-        self.btn = QtGui.QPushButton("Procesar", self)      # hago un push button que activa el progress bar
-        self.btn.move(304, 350)                             # donde va ubicado el boton
-        self.btn.clicked.connect(self.process)              # que es lo que hace el boton. Tengo que definir un metodo download
+        self.btn = QtGui.QPushButton("Procesar", self)          # hago un push button que activa el progress bar
+        self.btn.move(304, 350)                                 # donde va ubicado el boton
+        self.btn.clicked.connect(self.process)                  # que es lo que hace el boton. Tengo que definir un metodo download
 
         self.btn2 = QtGui.QPushButton("REC", self)
         self.btn2.move(254, 190)
@@ -287,10 +280,6 @@ class Window(QtGui.QMainWindow):
             self.completed += 0.001                     # le voy sumando de a estos pasos redefiniendo self.completed
             self.progress.setValue(self.completed)      # seteo el valor como el de self.completed
 
-    def file_open(self):
-        name = QtGui.QFileDialog.getOpenFileName(self, 'Abrir Archivo')
-        file = open(name, 'r')
-
 
     def file_save(self):
         name = QtGui.QFileDialog.getSaveFileName(self, 'Guardar Archivo')
@@ -302,7 +291,7 @@ class Window(QtGui.QMainWindow):
                                             QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
 
         if choice == QtGui.QMessageBox.Yes:
-            sys.exit()  # cierra la app al apretar el boton
+            sys.exit()                  # cierra la app al apretar el boton
         else:
             pass
 

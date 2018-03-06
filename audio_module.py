@@ -1,12 +1,14 @@
 import sys
 import wave
 from PyQt4 import QtGui
+from scipy.signal import deconvolve as deconvolve
+from scipy.signal import sosfilt as sosfilt
 from scipy.signal import lfilter as lfilter
-from scipy.io.wavfile import read as wavread
 import pyaudio
+import librosa as lb
+import numpy as np
 import sounddevice as sd
 import SWHear
-
 
 
 class AudioModule(QtGui.QMainWindow):
@@ -20,21 +22,21 @@ class AudioModule(QtGui.QMainWindow):
         pass
         # stream.stop_stream()
 
-    def start(self):
+    def start(self):                                #deteccion automatica del driver de audio que se usa
         self.ear = SWHear.SWHear()
         self.ear.stream_start()
 
     def rec(self):
         formato = pyaudio.paInt16
-        canales = 2
+        canales = 1
         rate = 44100
         chunk = 1024
-        record_seconds = 7
-        wave_output_filename = "file.wav"
+        record_seconds = 7                          #tiempo de grabacion;poner un getstring para el usuario?
+        wave_output_filename = "rec_file.wav"
 
         audio = pyaudio.PyAudio()
 
-        # start Recording
+        # Abro el stream para grabar
         stream = audio.open(format=formato, channels=canales,
                             rate=rate, input=True,
                             frames_per_buffer=chunk)
@@ -51,7 +53,7 @@ class AudioModule(QtGui.QMainWindow):
         stream.close()
         audio.terminate()
 
-        # Sin esta siguiente parte de wavfile, termina la grabacion pero no lo guarda
+        # Guardo el archivo
 
         waveFile = wave.open(wave_output_filename, 'wb')
         waveFile.setnchannels(canales)
@@ -69,30 +71,29 @@ class AudioModule(QtGui.QMainWindow):
         chunk = 1024
 
         # Levanto el archivo wav
-        f = wave.open("file2.wav", "rb")
+        f = wave.open("rec_file.wav", "rb")
 
         # Levanto PyAudio
         p = pyaudio.PyAudio()
 
-        # Abro stream
+        # Abro un stream
         stream = p.open(format=p.get_format_from_width(f.getsampwidth()),
                         channels=f.getnchannels(),
                         rate=f.getframerate(),
                         output=True)
 
-        # read data
         data = f.readframes(chunk)
 
-        # play stream
+        # Reproduzco el stream
         while data:
             stream.write(data)
             data = f.readframes(chunk)
 
-        # stop stream
+        # Stop stream
         stream.stop_stream()
         stream.close()
 
-        # cierro PyAudio
+        # Cierro PyAudio
         p.terminate()
 
 
@@ -100,42 +101,78 @@ class AudioModule(QtGui.QMainWindow):
 
         #Abro el archivo, y lo convierto en un array de intensidad
 
-        [samplerate, x] = wavread("file.wav")  # x es un numpy array of integer, representando los samples
-
-        # escalo de -1.0 -- 1.0
-
-        if x.dtype == 'int16':
-            nb_bits = 16                            # -> 16-bit wav
-        elif x.dtype == 'int32':
-            nb_bits = 32                            # -> 32-bit wav files
-        max_nb_bit = float(2 ** (nb_bits - 1))
-        samples = x / (max_nb_bit + 1.0)             # samples is a numpy array of float representing the samples
-        #return samples
+        x, samplerate = lb.load("rec_file.wav",44100)           #si no especifico este samplerate, librosa downsamplea
 
 
-        #transcribir funcion z al denominador y numerador coeficientes
+        #-----------------------------------------------------------------------
+        #Usando deconvolve
 
-        #lfilter ([1., 2.], [3., 0., 1.], [3., 45., 5., 6., 4., 3., 7., 8., 125., 110., 75.])
+        #ap_filter = np.array([0.5, 1.0, 0.5])
 
-        #Aplico la transformada inversa del sistema
+        #q, r = deconvolve(samples, ap_filter)
 
-        tf1 = lfilter ([1., 2.], [3., 0., 1.], [samples])
+        #b, a = convolve (q,ap_filter)
 
-        #Aplico la transformada de algun otro mic
+        #print len(q)
+        #print q
+        #print len(b)
+        #print b
 
-        tf2 = lfilter([1., 2.], [1., 0., 3.], [tf1])
+        # --------------------------------------------------------------------
+        #Usando lfilter
 
-        #guardar en archivo (ver el metodo que lo hace#
+        #Defino numerador y denominador de la funcion transferencia del mic
 
 
+        b = [2., 1.395, 0.18]                                   #numerador
+        a = [1., 0.004, 0.816]                                  #denominador
+
+        #---------------------------------------------------------------------
+        #Podria usar sosfilt
 
 
-        #f es el vector de audio que estoy levantando
+        #sos = [a+b]
+        #sos = [[1.0, 0.004, 0.816, 1, 1.395, 0.18], [1e-06, 1.395, 0.18, 1, 0.004, 0.816]]
+
+        #filtered = sosfilt(sos,x)
+        #y = sos2zpk(sos)           #polos y ceros del sistema
+
+        #---------------------------------------------------------------------
+
+        #Aplico primero el filtro inverso de la transferencia, y despues la transferencia de algun otro mic
+
+        # Aca se aplica la inversa de la funcion transferencia de un mic y luego la funcion transferencia
+        # original para verificar que la senal de origen queda igual
+
+
+        filtered = lfilter(b,a,lfilter(a,b,x))
+
+        #La idea es que lfilter(a,b,x) aplique el filtro inverso del mic MAF por ejemplo (para dejar limpia la senal
+        #es decir, para que no tenga influencia de la funcion transferencia del mic) y luego con el lfilter de afuera
+        #aplicar otra funcion transferencia, por ejemplo del filtro MCF.
+
+        #Verificar en este paso que la ROC del sistema inverso converja (Sino tira error Audio buffer is not finite everywhere)
+        #cuando hay polos fuera del circulo unitario.
+
+        #---------------------------------------------------------------------------
+        #Guardar en archivo
+
+        lb.output.write_wav('recfile_filtered.wav', filtered, samplerate)
+
+        #sf.write('file_trim2.wav', filtered, samplerate)
+
+        print len(x)
+        print x
+        print x.dtype
+
+        print len(filtered)
+        print filtered
+
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     form = AudioModule()
     form.show()
-    form.update()  # start with something
+    form.update()
     app.exec_()
     print("DONE")
