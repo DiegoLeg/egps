@@ -6,16 +6,17 @@ from threading import Thread
 
 import librosa as lb
 import pyaudio
+# No borrar esta dependencia
+import sounddevice as sd
 
 from config import OUTPUT_FILE_PATH
-from sw_hear_ext import SWHear
+from sw_hear_ext.SWHear import SWHear
 
 
 class AudioModule(QtGui.QMainWindow):
-
     def __init__(self, parent=None):
         super(AudioModule, self).__init__(parent)
-        self.ear = SWHear.SWHear(rate=44100, updatesPerSecond=20)
+        self.ear = SWHear(rate=44100, updatesPerSecond=20)
         self.ear.stream_initStop()                  # puedo cambiarlo para que arranque ya con el stream on
         self.p = pyaudio.PyAudio()
 
@@ -61,8 +62,6 @@ class AudioModule(QtGui.QMainWindow):
     def stop(self):
         self.stream.stop_stream()
 
-    #def init_thread(self):
-
     def callback(self, in_data, frame_count, time_info, status):
         data = self.f.readframes(frame_count)
         return (data, pyaudio.paContinue)
@@ -84,8 +83,6 @@ class AudioModule(QtGui.QMainWindow):
         thread = Thread(target=self.play_file)
         thread.setDaemon(True)
         thread.start()
-
-
 
     def process(self):
 
