@@ -1,5 +1,6 @@
 import sys
 from PyQt4 import QtGui
+
 from audio_module import audio_module
 from config import *
 
@@ -353,16 +354,3 @@ class Window(QtGui.QMainWindow):
             print ("7")
         else:
             print ("DAH")
-
-
-# ---------------------------------------------------------------------------
-
-
-def run():  # defino un metodo run para que corra la app
-
-    app = QtGui.QApplication(sys.argv)
-    GUI = Window()
-    sys.exit(app.exec_())
-
-
-run()
