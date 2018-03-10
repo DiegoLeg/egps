@@ -1,4 +1,3 @@
-import sys
 import wave
 from PyQt4 import QtGui
 from scipy.signal import lfilter as lfilter
@@ -7,7 +6,7 @@ import librosa as lb
 import pyaudio
 import sounddevice as sd
 
-import SWHear
+from sw_hear_ext import SWHear
 from config import OUTPUT_FILE_PATH
 
 
@@ -137,13 +136,4 @@ class AudioModule(QtGui.QMainWindow):
         print x.dtype
 
         print len(filtered)
-        print filtered
-
-
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    form = AudioModule()
-    form.show()
-    form.update()
-    app.exec_()
-    print("DONE")
+        print filtered()
