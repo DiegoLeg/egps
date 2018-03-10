@@ -1,13 +1,14 @@
+import time
 import wave
 from PyQt4 import QtGui
 from scipy.signal import lfilter as lfilter
+from threading import Thread
 
 import librosa as lb
 import pyaudio
-import sounddevice as sd
 
-from sw_hear_ext import SWHear
 from config import OUTPUT_FILE_PATH
+from sw_hear_ext import SWHear
 
 
 class AudioModule(QtGui.QMainWindow):
@@ -16,6 +17,7 @@ class AudioModule(QtGui.QMainWindow):
         super(AudioModule, self).__init__(parent)
         self.ear = SWHear.SWHear(rate=44100, updatesPerSecond=20)
         self.ear.stream_initStop()                  # puedo cambiarlo para que arranque ya con el stream on
+        self.p = pyaudio.PyAudio()
 
     def start(self):                                #deteccion automatica del driver de audio que se usa
         self.ear.stream_start()
@@ -57,41 +59,32 @@ class AudioModule(QtGui.QMainWindow):
         waveFile.close()
 
     def stop(self):
-        # recording = False
-        sd.stop()
+        self.stream.stop_stream()
 
     #def init_thread(self):
 
+    def callback(self, in_data, frame_count, time_info, status):
+        data = self.f.readframes(frame_count)
+        return (data, pyaudio.paContinue)
 
-    def play(self):
-
-        chunk = 1024
-
+    def play_file(self, ):
         # Levanto el archivo wav
-        f = wave.open(OUTPUT_FILE_PATH, "rb")
-
-        # Levanto PyAudio
-        p = pyaudio.PyAudio()
+        self.f = wave.open(OUTPUT_FILE_PATH, "rb")
 
         # Abro un stream
-        stream = p.open(format=p.get_format_from_width(f.getsampwidth()),
-                        channels=f.getnchannels(),
-                        rate=f.getframerate(),
-                        output=True)
+        self.stream = self.p.open(format=self.p.get_format_from_width(self.f.getsampwidth()),
+                                  channels=self.f.getnchannels(), rate=self.f.getframerate(),
+                                  output=True, stream_callback=self.callback)
 
-        data = f.readframes(chunk)
+        self.stream.start_stream()
+        while self.stream.is_active():
+            time.sleep(0.01)
 
-        # Reproduzco el stream
-        while data:
-            stream.write(data)
-            data = f.readframes(chunk)
+    def play(self):
+        thread = Thread(target=self.play_file)
+        thread.setDaemon(True)
+        thread.start()
 
-        # Stop stream
-        stream.stop_stream()
-        stream.close()
-
-        # Cierro PyAudio
-        p.terminate()
 
 
     def process(self):
