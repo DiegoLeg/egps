@@ -1,6 +1,8 @@
 import sys
 from PyQt4 import QtGui
-import audio_module
+from audio_module import audio_module
+from config import *
+
 
 class Window(QtGui.QMainWindow):
 
@@ -28,6 +30,8 @@ class Window(QtGui.QMainWindow):
         fileMenu.addAction(saveFile)
         fileMenu.addAction(extractAction)
 
+        self.audio_mod = audio_module.AudioModule()
+
         self.home()                                             #Defino home mas abajo
 
     def home(self):
@@ -50,22 +54,22 @@ class Window(QtGui.QMainWindow):
 
         self.btn2 = QtGui.QPushButton("REC", self)
         self.btn2.move(254, 190)
-        self.btn2.setIcon(QtGui.QIcon('rec.png'))
+        self.btn2.setIcon(QtGui.QIcon(REC_IMAGE_PATH))
         self.btn2.clicked.connect(self.rec)
 
         self.btn3 = QtGui.QPushButton("STOP", self)
         self.btn3.move(354, 190)
-        self.btn3.setIcon(QtGui.QIcon('stop.png'))
+        self.btn3.setIcon(QtGui.QIcon(STOP_IMAGE_PATH))
         self.btn3.clicked.connect(self.stop)
 
         self.btn4 = QtGui.QPushButton("NEW", self)
         self.btn4.move(304, 140)
-        self.btn4.setIcon(QtGui.QIcon('new.png'))
+        self.btn4.setIcon(QtGui.QIcon(NEW_IMAGE_PATH))
         self.btn4.clicked.connect(self.download)
 
         self.btn5 = QtGui.QPushButton("PLAY", self)
         self.btn5.move(304, 240)
-        self.btn5.setIcon(QtGui.QIcon('play.png'))
+        self.btn5.setIcon(QtGui.QIcon(PLAY_IMAGE_PATH))
         self.btn5.clicked.connect(self.play)
 
         # --------------------------------------------------------------------------------
@@ -137,86 +141,86 @@ class Window(QtGui.QMainWindow):
 
         self.play_Maf = QtGui.QPushButton("", self)
         self.play_Maf.move(570, 86)
-        self.play_Maf.setIcon(QtGui.QIcon('play.png'))
+        self.play_Maf.setIcon(QtGui.QIcon(PLAY_IMAGE_PATH))
         self.play_Maf.resize(self.play_Maf.minimumSizeHint())
         self.play_Maf.clicked.connect(self.play)
 
         self.play_Mcf = QtGui.QPushButton("", self)
         self.play_Mcf.move(570, 126)
-        self.play_Mcf.setIcon(QtGui.QIcon('play.png'))
+        self.play_Mcf.setIcon(QtGui.QIcon(PLAY_IMAGE_PATH))
         self.play_Mcf.resize(self.play_Mcf.minimumSizeHint())
         self.play_Mcf.clicked.connect(self.download)
 
         self.play_Mvf = QtGui.QPushButton("", self)
         self.play_Mvf.move(570, 166)
-        self.play_Mvf.setIcon(QtGui.QIcon('play.png'))
+        self.play_Mvf.setIcon(QtGui.QIcon(PLAY_IMAGE_PATH))
         self.play_Mvf.resize(self.play_Mvf.minimumSizeHint())
         self.play_Mvf.clicked.connect(self.download)
 
         self.play_Mnf = QtGui.QPushButton("", self)
         self.play_Mnf.move(570, 206)
-        self.play_Mnf.setIcon(QtGui.QIcon('play.png'))
+        self.play_Mnf.setIcon(QtGui.QIcon(PLAY_IMAGE_PATH))
         self.play_Mnf.resize(self.play_Mnf.minimumSizeHint())
         self.play_Mnf.clicked.connect(self.download)
 
         self.play_Mrf = QtGui.QPushButton("", self)
         self.play_Mrf.move(570, 246)
-        self.play_Mrf.setIcon(QtGui.QIcon('play.png'))
+        self.play_Mrf.setIcon(QtGui.QIcon(PLAY_IMAGE_PATH))
         self.play_Mrf.resize(self.play_Mrf.minimumSizeHint())
         self.play_Mrf.clicked.connect(self.download)
 
         self.play_Mtn = QtGui.QPushButton("", self)
         self.play_Mtn.move(570, 286)
-        self.play_Mtn.setIcon(QtGui.QIcon('play.png'))
+        self.play_Mtn.setIcon(QtGui.QIcon(PLAY_IMAGE_PATH))
         self.play_Mtn.resize(self.play_Mtn.minimumSizeHint())
         self.play_Mtn.clicked.connect(self.download)
 
         self.play_Mtb = QtGui.QPushButton("", self)
         self.play_Mtb.move(570, 326)
-        self.play_Mtb.setIcon(QtGui.QIcon('play.png'))
+        self.play_Mtb.setIcon(QtGui.QIcon(PLAY_IMAGE_PATH))
         self.play_Mtb.resize(self.play_Mtb.minimumSizeHint())
         self.play_Mtb.clicked.connect(self.download)
         # ----------------------------------------------------------------------
 
         self.stop_Maf = QtGui.QPushButton("", self)
         self.stop_Maf.move(610, 86)
-        self.stop_Maf.setIcon(QtGui.QIcon('stop.png'))
+        self.stop_Maf.setIcon(QtGui.QIcon(STOP_IMAGE_PATH))
         self.stop_Maf.resize(self.stop_Maf.minimumSizeHint())
         self.stop_Maf.clicked.connect(self.download)
 
         self.stop_Mcf = QtGui.QPushButton("", self)
         self.stop_Mcf.move(610, 126)
-        self.stop_Mcf.setIcon(QtGui.QIcon('stop.png'))
+        self.stop_Mcf.setIcon(QtGui.QIcon(STOP_IMAGE_PATH))
         self.stop_Mcf.resize(self.stop_Mcf.minimumSizeHint())
         self.stop_Mcf.clicked.connect(self.download)
 
         self.stop_Mvf = QtGui.QPushButton("", self)
         self.stop_Mvf.move(610, 166)
-        self.stop_Mvf.setIcon(QtGui.QIcon('stop.png'))
+        self.stop_Mvf.setIcon(QtGui.QIcon(STOP_IMAGE_PATH))
         self.stop_Mvf.resize(self.stop_Mvf.minimumSizeHint())
         self.stop_Mvf.clicked.connect(self.download)
 
         self.stop_Mnf = QtGui.QPushButton("", self)
         self.stop_Mnf.move(610, 206)
-        self.stop_Mnf.setIcon(QtGui.QIcon('stop.png'))
+        self.stop_Mnf.setIcon(QtGui.QIcon(STOP_IMAGE_PATH))
         self.stop_Mnf.resize(self.stop_Mnf.minimumSizeHint())
         self.stop_Mnf.clicked.connect(self.download)
 
         self.stop_Mrf = QtGui.QPushButton("", self)
         self.stop_Mrf.move(610, 246)
-        self.stop_Mrf.setIcon(QtGui.QIcon('stop.png'))
+        self.stop_Mrf.setIcon(QtGui.QIcon(STOP_IMAGE_PATH))
         self.stop_Mrf.resize(self.stop_Mrf.minimumSizeHint())
         self.stop_Mrf.clicked.connect(self.download)
 
         self.stop_Mtn = QtGui.QPushButton("", self)
         self.stop_Mtn.move(610, 286)
-        self.stop_Mtn.setIcon(QtGui.QIcon('stop.png'))
+        self.stop_Mtn.setIcon(QtGui.QIcon(STOP_IMAGE_PATH))
         self.stop_Mtn.resize(self.stop_Mtn.minimumSizeHint())
         self.stop_Mtn.clicked.connect(self.download)
 
         self.stop_Mtb = QtGui.QPushButton("", self)
         self.stop_Mtb.move(610, 326)
-        self.stop_Mtb.setIcon(QtGui.QIcon('stop.png'))
+        self.stop_Mtb.setIcon(QtGui.QIcon(STOP_IMAGE_PATH))
         self.stop_Mtb.resize(self.stop_Mtb.minimumSizeHint())
         self.stop_Mtb.clicked.connect(self.download)
 
@@ -224,43 +228,43 @@ class Window(QtGui.QMainWindow):
 
         self.save_Maf = QtGui.QPushButton("", self)
         self.save_Maf.move(650, 86)
-        self.save_Maf.setIcon(QtGui.QIcon('save.png'))
+        self.save_Maf.setIcon(QtGui.QIcon(SAVE_IMAGE_PATH))
         self.save_Maf.resize(self.save_Maf.minimumSizeHint())
         self.save_Maf.clicked.connect(self.file_save)
 
         self.save_Mcf = QtGui.QPushButton("", self)
         self.save_Mcf.move(650, 126)
-        self.save_Mcf.setIcon(QtGui.QIcon('save.png'))
+        self.save_Mcf.setIcon(QtGui.QIcon(SAVE_IMAGE_PATH))
         self.save_Mcf.resize(self.save_Mcf.minimumSizeHint())
         self.save_Mcf.clicked.connect(self.file_save)
 
         self.save_Mvf = QtGui.QPushButton("", self)
         self.save_Mvf.move(650, 166)
-        self.save_Mvf.setIcon(QtGui.QIcon('save.png'))
+        self.save_Mvf.setIcon(QtGui.QIcon(SAVE_IMAGE_PATH))
         self.save_Mvf.resize(self.save_Mvf.minimumSizeHint())
         self.save_Mvf.clicked.connect(self.file_save)
 
         self.save_Mnf = QtGui.QPushButton("", self)
         self.save_Mnf.move(650, 206)
-        self.save_Mnf.setIcon(QtGui.QIcon('save.png'))
+        self.save_Mnf.setIcon(QtGui.QIcon(SAVE_IMAGE_PATH))
         self.save_Mnf.resize(self.save_Mnf.minimumSizeHint())
         self.save_Mnf.clicked.connect(self.file_save)
 
         self.save_Mrf = QtGui.QPushButton("", self)
         self.save_Mrf.move(650, 246)
-        self.save_Mrf.setIcon(QtGui.QIcon('save.png'))
+        self.save_Mrf.setIcon(QtGui.QIcon(SAVE_IMAGE_PATH))
         self.save_Mrf.resize(self.save_Mrf.minimumSizeHint())
         self.save_Mrf.clicked.connect(self.file_save)
 
         self.save_Mtn = QtGui.QPushButton("", self)
         self.save_Mtn.move(650, 286)
-        self.save_Mtn.setIcon(QtGui.QIcon('save.png'))
+        self.save_Mtn.setIcon(QtGui.QIcon(SAVE_IMAGE_PATH))
         self.save_Mtn.resize(self.save_Mtn.minimumSizeHint())
         self.save_Mtn.clicked.connect(self.file_save)
 
         self.save_Mtb = QtGui.QPushButton("", self)
         self.save_Mtb.move(650, 326)
-        self.save_Mtb.setIcon(QtGui.QIcon('save.png'))
+        self.save_Mtb.setIcon(QtGui.QIcon(SAVE_IMAGE_PATH))
         self.save_Mtb.resize(self.save_Mtb.minimumSizeHint())
         self.save_Mtb.clicked.connect(self.file_save)
 
@@ -310,20 +314,16 @@ class Window(QtGui.QMainWindow):
     # Audio Module
 
     def rec(self):
-        AudioModule = audio_module.AudioModule()
-        AudioModule.rec()
+        self.audio_mod.rec()
 
     def play(self):
-        AudioModule = audio_module.AudioModule()
-        AudioModule.play()
+        self.audio_mod.play()
 
     def stop(self):
-        AudioModule = audio_module.AudioModule()
-        AudioModule.stop()
+        self.audio_mod.stop()
 
     def process(self):
-        AudioModule = audio_module.AudioModule()
-        AudioModule.process()
+        self.audio_mod.process()
     #---------------------------------------------------------------------------
 
 
