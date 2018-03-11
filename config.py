@@ -1,6 +1,5 @@
 REC_IMAGE_PATH = "./rcs/rec.png"
 STOP_IMAGE_PATH = "./rcs/stop.png"
-NEW_IMAGE_PATH = "./rcs/new.png"
 PLAY_IMAGE_PATH = "./rcs/play.png"
 SAVE_IMAGE_PATH = "./rcs/save.png"
 
