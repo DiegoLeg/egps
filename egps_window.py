@@ -16,6 +16,7 @@ PROCESS_GROUP = "process"
 
 class EGPSWindow(QMainWindow):
     def select_file(self):  # defino el boton descargar
+        self.audio_mod.stop_rec()
         file_path = str(QFileDialog.getOpenFileName(self, "Elegir archivo"))
         if file_path != "":
             if file_path.endswith(".wav"):
@@ -25,10 +26,10 @@ class EGPSWindow(QMainWindow):
             else:
                 self.err_box.exec_()
 
-
-    def f_save(self):
-        name = QFileDialog.getSaveFileName(self, 'Guardar Archivo')
-        file = save(name, 'w')
+    def file_save(self):
+        file_path = str(QFileDialog.getSaveFileName(self, 'Guardar archivo'))
+        if file_path != "" and not self.audio_mod.save_rec(file_path):
+            self.err_box.exec_()
 
     def closeEvent(self, event):
         # Overwriten method from parent QWidget. QWidget -> QMainWindow -> EGPSWindow
@@ -74,15 +75,15 @@ class EGPSWindow(QMainWindow):
         # List of parameters and the function to create the window push buttons
         push_buttons_func = self.define_push_button
         nm_px_py_callb_push_buttons = [
-            ("", 55, 70, self.audio_mod.stop, STOP_IMAGE_PATH, True), ("Elegir archivo", 15, 35, self.select_file),
-            ("", 15, 70, self.audio_mod.play, PLAY_IMAGE_PATH, True),
+            ("", 55, 70, self.audio_mod.stop_file, STOP_IMAGE_PATH, True), ("Elegir archivo", 15, 35, self.select_file),
+            ("", 15, 70, self.audio_mod.play_file, PLAY_IMAGE_PATH, True),
             ("", 405, 145, self.audio_mod.rec, REC_IMAGE_PATH, True),
-            ("", 445, 145, self.audio_mod.stop, STOP_IMAGE_PATH, True),
-            ("", 485, 145, self.audio_mod.play, PLAY_IMAGE_PATH, True),
-            ("", 525, 145, self.f_save, SAVE_IMAGE_PATH, True),
-            ("", 405, 355, self.audio_mod.play, PLAY_IMAGE_PATH, True),
-            ("", 445, 355, self.audio_mod.stop, STOP_IMAGE_PATH, True),
-            ("", 485, 355, self.f_save, SAVE_IMAGE_PATH, True)
+            ("", 445, 145, self.audio_mod.stop_rec, STOP_IMAGE_PATH, True),
+            ("", 485, 145, self.audio_mod.play_rec, PLAY_IMAGE_PATH, True),
+            ("", 525, 145, self.file_save, SAVE_IMAGE_PATH, True),
+            ("", 405, 355, self.audio_mod.play_file, PLAY_IMAGE_PATH, True),
+            ("", 445, 355, self.audio_mod.play_file, STOP_IMAGE_PATH, True),
+            ("", 485, 355, self.file_save, SAVE_IMAGE_PATH, True)
         ]
 
         # Define a list of tuples with (constructor, list of constructor params) for the different kind of elements.
@@ -118,7 +119,6 @@ class EGPSWindow(QMainWindow):
         self.path_label = QLabel(os.path.abspath(OUTPUT_FILE_PATH), self)
         self.path_label.move(128, 40)
         self.path_label.resize(self.path_label.minimumSizeHint())
-
 
         # Method from parent QWidget. QWidget -> QMainWindow -> EGPSWindow
         self.show()
