@@ -18,8 +18,13 @@ class EGPSWindow(QMainWindow):
     def select_file(self):  # defino el boton descargar
         file_path = str(QFileDialog.getOpenFileName(self, "Elegir archivo"))
         if file_path != "":
-            self.path_label.setText(file_path)
-            self.path_label.resize(self.path_label.minimumSizeHint())
+            if file_path.endswith(".wav"):
+                self.path_label.setText(file_path)
+                self.path_label.resize(self.path_label.minimumSizeHint())
+                self.audio_mod.load_file(file_path)
+            else:
+                self.err_box.exec_()
+
 
     def f_save(self):
         name = QFileDialog.getSaveFileName(self, 'Guardar Archivo')
@@ -104,6 +109,10 @@ class EGPSWindow(QMainWindow):
         self.msg_box.setText("Esta seguro que desea salir?")
         self.msg_box.addButton("Si", QMessageBox.AcceptRole)
         self.msg_box.addButton("No", QMessageBox.RejectRole)
+
+        self.err_box = QMessageBox()
+        self.err_box.setWindowTitle("Error")
+        self.err_box.setText("El archivo tiene formato incorrecto")
 
         # Create select play file
         self.path_label = QLabel(os.path.abspath(OUTPUT_FILE_PATH), self)

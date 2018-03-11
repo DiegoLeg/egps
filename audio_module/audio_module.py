@@ -24,6 +24,11 @@ class AudioModule:
         self.stream.close()
         self.p.terminate()
 
+    def load_file(self, wav_file_path):
+        self.stop()
+        self.f.close()
+        self.f = wave.open(wav_file_path, "rb")
+
     def callback(self, in_data, frame_count, time_info, status):
         data = self.f.readframes(frame_count)
         return data, pyaudio.paContinue
