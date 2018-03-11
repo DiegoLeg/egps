@@ -1,6 +1,5 @@
 import time
 import wave
-from PyQt4 import QtGui
 from scipy.signal import lfilter as lfilter
 from threading import Thread
 
@@ -10,25 +9,49 @@ import pyaudio
 import sounddevice as sd
 
 from config import OUTPUT_FILE_PATH
-from sw_hear_ext.SWHear import SWHear
 
 
-class AudioModule(QtGui.QMainWindow):
-    def __init__(self, parent=None):
-        super(AudioModule, self).__init__(parent)
-        self.ear = SWHear(rate=44100, updatesPerSecond=20)
-        self.ear.stream_initStop()                  # puedo cambiarlo para que arranque ya con el stream on
+class AudioModule:
+    def __init__(self, wav_file_path):
         self.p = pyaudio.PyAudio()
+        self.f = wave.open(wav_file_path, "rb")
+        self.stream = self.p.open(format=self.p.get_format_from_width(self.f.getsampwidth()),
+                                  channels=self.f.getnchannels(), rate=self.f.getframerate(),
+                                  output=True, stream_callback=self.callback)
+        self.stream.stop_stream()
 
-    def start(self):                                #deteccion automatica del driver de audio que se usa
-        self.ear.stream_start()
+    def __del__(self):
+        self.stream.close()
+        self.p.terminate()
+
+    def callback(self, in_data, frame_count, time_info, status):
+        data = self.f.readframes(frame_count)
+        return data, pyaudio.paContinue
+
+    def stop(self):
+        self.stream.stop_stream()
+        self.f.rewind()
+
+    def play_in_thread(self):
+        if self.stream.is_active():
+            self.stop()
+            time.sleep(0.002)
+        self.stream.start_stream()
+        while self.stream.is_active():
+            time.sleep(0.001)
+
+    def play(self):
+        thread = Thread(target=self.play_in_thread)
+        thread.setDaemon(True)
+        thread.start()
 
     def rec(self):
         formato = pyaudio.paInt16
         canales = 1
         rate = 44100
         chunk = 1024
-        record_seconds = 7                          #tiempo de grabacion;poner un getstring para el usuario?
+        record_seconds = 7
+        #tiempo de grabacion;poner un getstring para el usuario?
         wave_output_filename = OUTPUT_FILE_PATH
 
         audio = pyaudio.PyAudio()
@@ -58,31 +81,6 @@ class AudioModule(QtGui.QMainWindow):
         waveFile.setframerate(rate)
         waveFile.writeframes(b''.join(frames))
         waveFile.close()
-
-    def stop(self):
-        self.stream.stop_stream()
-
-    def callback(self, in_data, frame_count, time_info, status):
-        data = self.f.readframes(frame_count)
-        return (data, pyaudio.paContinue)
-
-    def play_file(self, ):
-        # Levanto el archivo wav
-        self.f = wave.open(OUTPUT_FILE_PATH, "rb")
-
-        # Abro un stream
-        self.stream = self.p.open(format=self.p.get_format_from_width(self.f.getsampwidth()),
-                                  channels=self.f.getnchannels(), rate=self.f.getframerate(),
-                                  output=True, stream_callback=self.callback)
-
-        self.stream.start_stream()
-        while self.stream.is_active():
-            time.sleep(0.01)
-
-    def play(self):
-        thread = Thread(target=self.play_file)
-        thread.setDaemon(True)
-        thread.start()
 
     def process(self):
 

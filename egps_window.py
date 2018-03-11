@@ -6,7 +6,7 @@ from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QLabel, QPushButton, QMainWindow, QMessageBox, QFileDialog, QIcon, QRadioButton, QProgressBar, \
     QButtonGroup
 
-from audio_module import audio_module
+from audio_module.audio_module import AudioModule
 from config import *
 
 INPUT_GROUP = "input"
@@ -16,8 +16,10 @@ PROCESS_GROUP = "process"
 
 class EGPSWindow(QMainWindow):
     def select_file(self):  # defino el boton descargar
-        self.path_label.setText(str(QFileDialog.getOpenFileName(self, "Select Directory")))
-        self.path_label.resize(self.path_label.minimumSizeHint())
+        file_path = str(QFileDialog.getOpenFileName(self, "Elegir archivo"))
+        if file_path != "":
+            self.path_label.setText(file_path)
+            self.path_label.resize(self.path_label.minimumSizeHint())
 
     def f_save(self):
         name = QFileDialog.getSaveFileName(self, 'Guardar Archivo')
@@ -36,7 +38,7 @@ class EGPSWindow(QMainWindow):
     def __init__(self):
         # Initialize the parent and the audio_module
         super(EGPSWindow, self).__init__()
-        self.audio_mod = audio_module.AudioModule()
+        self.audio_mod = AudioModule(OUTPUT_FILE_PATH)
 
         # Title, size and prevent resize
         self.setWindowTitle("EGPS-1")
