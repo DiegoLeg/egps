@@ -18,7 +18,11 @@ a = [1., -0.1608, 0.5231]  # denominador
 
 
 class EGPSWindow(QMainWindow):
-    def select_file(self):  # defino el boton descargar
+    def select_file(self):
+        """
+        Se define un metodo para la seleccion de un archivo de audio existente
+
+        """
         self.audio_mod.stop_rec()
         file_path = str(QFileDialog.getOpenFileName(self, "Elegir archivo"))
         if file_path != "":
@@ -72,7 +76,7 @@ class EGPSWindow(QMainWindow):
                            ("Archivo de entrada", 10, 10), ("Transductor de salida", 200, 105),
                            ("Entrada a procesar", 400, 230)]
 
-        # The function and list of parameters to create the window radio buttons
+        # The function and list of parameters to create radio buttons
         in_bq = QButtonGroup(self)
         out_bq = QButtonGroup(self)
         process_bq = QButtonGroup(self)
@@ -128,7 +132,7 @@ class EGPSWindow(QMainWindow):
 
         self.no_data_box = QMessageBox()
         self.no_data_box.setWindowTitle("Error")
-        self.no_data_box.setText("No se puede usar esa ruta o no hay datos")
+        self.no_data_box.setText("No se puede utilizar la ruta indicada o los datos son inexistentes")
 
         # Create select play file
         self.path_label = QLabel(os.path.abspath(OUTPUT_FILE_PATH), self)
@@ -139,11 +143,29 @@ class EGPSWindow(QMainWindow):
         self.show()
 
     def create_label(self, name, pos_x, pos_y):
+        """
+        Se define un metodo para la creacion de los labels de la interfaz grafica
+        :param name: Nombre del label
+        :param pos_x: Posicion horizontal
+        :param pos_y: Posicion vertical
+
+        """
         label = QLabel(name, self)
         label.move(pos_x, pos_y)
         label.resize(label.minimumSizeHint())
 
     def define_push_button(self, text, pos_x, pos_y, callback, image_path=None, resize=False):
+        """
+        Se define un metodo para la creacion de push buttons en la interfaz grafica
+
+        :param text: Texto que muestra el pushbutton
+        :param pos_x: Posicion horizontal
+        :param pos_y: Posicion Vertical
+        :param callback:
+        :param image_path: Ruta del icono o imagen asociada al push button
+        :param resize: Cambia el tamano del pushbutton
+        :return:
+        """
         btn = QPushButton(text, self)
         btn.move(pos_x, pos_y)
         if image_path:
@@ -154,6 +176,16 @@ class EGPSWindow(QMainWindow):
         self.connect(btn, SIGNAL("clicked()"), callback)
 
     def create_radio_button(self, text, pos_x, pos_y, group, button_group):
+        """
+        Se define un metodo para la creacion de radio buttons
+
+        :param text: Texto que acompana al radio button
+        :param pos_x: Posicion horizontal
+        :param pos_y: Posicion vertical
+        :param group:
+        :param button_group:
+        :return:
+        """
         radio_button = QRadioButton(text, self)
         radio_button.move(pos_x, pos_y)
         # This binds the signal pressed() from the radio button to the radio_button_clicked method.
