@@ -132,7 +132,7 @@ class AudioModule:
             wave_file.close()
         return len(self.rec_frames) > 0
 
-    def play_out(self, in_num, in_den, out_num, out_den, recorded):
+    def play_out(self, recorded, in_num, in_den, out_num, out_den):
         if recorded:
             tf = tempfile.NamedTemporaryFile(suffix=".wav")
             if self.save_rec(tf.name):
@@ -158,7 +158,7 @@ class AudioModule:
         thread.setDaemon(True)
         thread.start()
 
-    def save_out(self, filename, in_num, in_den, out_num, out_den, recorded):
+    def save_out(self, filename, recorded, in_num, in_den, out_num, out_den):
         if recorded:
             tf = tempfile.NamedTemporaryFile(suffix=".wav")
             if self.save_rec(tf.name):

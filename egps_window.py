@@ -37,11 +37,13 @@ class EGPSWindow(QMainWindow):
     def out_file_save(self):
         file_path = str(QFileDialog.getSaveFileName(self, 'Guardar archivo'))
         recorded = self.input_output[PROCESS_GROUP] == "Grabacion"
-        if file_path != "" and not self.audio_mod.save_out(file_path, a, b, a, b, recorded):
+        tfs = TRANSFER_FUNCTIONS[self.input_output[INPUT_GROUP]] + TRANSFER_FUNCTIONS[self.input_output[OUTPUT_GROUP]]
+        if file_path != "" and not self.audio_mod.save_out(file_path, recorded, *tfs):
             self.no_data_box.exec_()
 
     def out_file_play(self):
-        self.audio_mod.play_out(a, b, a, b, self.input_output[PROCESS_GROUP] == "Grabacion")
+        tfs = TRANSFER_FUNCTIONS[self.input_output[INPUT_GROUP]] + TRANSFER_FUNCTIONS[self.input_output[OUTPUT_GROUP]]
+        self.audio_mod.play_out(self.input_output[PROCESS_GROUP] == "Grabacion", *tfs)
 
     def closeEvent(self, event):
         # Overwriten method from parent QWidget. QWidget -> QMainWindow -> EGPSWindow
@@ -59,9 +61,10 @@ class EGPSWindow(QMainWindow):
         self.audio_mod = AudioModule(OUTPUT_FILE_PATH)
 
         # Title, size and prevent resize
+        win_height = 130 + len(TRANSFER_FUNCTIONS) * 40
         self.setWindowTitle("EGPS-1")
-        self.setGeometry(70, 70, 600, 410)
-        self.setFixedSize(600, 410)
+        self.setGeometry(70, 70, 600, win_height)
+        self.setFixedSize(600, win_height)
 
         # The function and list of parameters to create the window labels
         labels_func = self.create_label
@@ -74,15 +77,11 @@ class EGPSWindow(QMainWindow):
         out_bq = QButtonGroup(self)
         process_bq = QButtonGroup(self)
         radio_buttons_func = self.create_radio_button
-        nm_px_py_cb_radio_buttons = [("MAF", 30, 125, INPUT_GROUP, in_bq), ("MCF", 30, 165, INPUT_GROUP, in_bq),
-                                     ("MVF", 30, 205, INPUT_GROUP, in_bq), ("MNF", 30, 245, INPUT_GROUP, in_bq),
-                                     ("MRF", 30, 285, INPUT_GROUP, in_bq), ("MT-N", 30, 325, INPUT_GROUP, in_bq),
-                                     ("MT-B", 30, 365, INPUT_GROUP, in_bq), ("MAF", 220, 125, OUTPUT_GROUP, out_bq),
-                                     ("MCF", 220, 165, OUTPUT_GROUP, out_bq), ("MVF", 220, 205, OUTPUT_GROUP, out_bq),
-                                     ("MNF", 220, 245, OUTPUT_GROUP, out_bq), ("MRF", 220, 285, OUTPUT_GROUP, out_bq),
-                                     ("MT-N", 220, 325, OUTPUT_GROUP, out_bq), ("MT-B", 220, 365, OUTPUT_GROUP, out_bq),
-                                     ("Archivo de entrada", 405, 255, PROCESS_GROUP, process_bq),
+        nm_px_py_cb_radio_buttons = [("Archivo de entrada", 405, 255, PROCESS_GROUP, process_bq),
                                      ("Grabacion", 405, 280, PROCESS_GROUP, process_bq)]
+        for index, transfer_function in enumerate(TRANSFER_FUNCTIONS.keys()):
+            nm_px_py_cb_radio_buttons.append((transfer_function, 30, 125 + index * 40, INPUT_GROUP, in_bq))
+            nm_px_py_cb_radio_buttons.append((transfer_function, 220, 125 + index * 40, OUTPUT_GROUP, out_bq))
 
         # List of parameters and the function to create the window push buttons
         push_buttons_func = self.define_push_button
