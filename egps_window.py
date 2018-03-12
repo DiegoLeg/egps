@@ -13,6 +13,9 @@ INPUT_GROUP = "input"
 OUTPUT_GROUP = "output"
 PROCESS_GROUP = "process"
 
+b = [2.844, 0.8472, 0.2055]  # numerador
+a = [1., -0.1608, 0.5231]  # denominador
+
 
 class EGPSWindow(QMainWindow):
     def select_file(self):  # defino el boton descargar
@@ -24,12 +27,21 @@ class EGPSWindow(QMainWindow):
                 self.path_label.resize(self.path_label.minimumSizeHint())
                 self.audio_mod.load_file(file_path)
             else:
-                self.err_box.exec_()
+                self.wrong_file_box.exec_()
 
-    def file_save(self):
+    def rec_file_save(self):
         file_path = str(QFileDialog.getSaveFileName(self, 'Guardar archivo'))
         if file_path != "" and not self.audio_mod.save_rec(file_path):
-            self.err_box.exec_()
+            self.no_data_box.exec_()
+
+    def out_file_save(self):
+        file_path = str(QFileDialog.getSaveFileName(self, 'Guardar archivo'))
+        recorded = self.input_output[PROCESS_GROUP] == "Grabacion"
+        if file_path != "" and not self.audio_mod.save_out(file_path, a, b, a, b, recorded):
+            self.no_data_box.exec_()
+
+    def out_file_play(self):
+        self.audio_mod.play_out(a, b, a, b, self.input_output[PROCESS_GROUP] == "Grabacion")
 
     def closeEvent(self, event):
         # Overwriten method from parent QWidget. QWidget -> QMainWindow -> EGPSWindow
@@ -80,10 +92,10 @@ class EGPSWindow(QMainWindow):
             ("", 405, 145, self.audio_mod.rec, REC_IMAGE_PATH, True),
             ("", 445, 145, self.audio_mod.stop_rec, STOP_IMAGE_PATH, True),
             ("", 485, 145, self.audio_mod.play_rec, PLAY_IMAGE_PATH, True),
-            ("", 525, 145, self.file_save, SAVE_IMAGE_PATH, True),
-            ("", 405, 355, self.audio_mod.play_file, PLAY_IMAGE_PATH, True),
-            ("", 445, 355, self.audio_mod.play_file, STOP_IMAGE_PATH, True),
-            ("", 485, 355, self.file_save, SAVE_IMAGE_PATH, True)
+            ("", 525, 145, self.rec_file_save, SAVE_IMAGE_PATH, True),
+            ("", 405, 355, self.out_file_play, PLAY_IMAGE_PATH, True),
+            ("", 445, 355, self.audio_mod.stop_out, STOP_IMAGE_PATH, True),
+            ("", 485, 355, self.out_file_save, SAVE_IMAGE_PATH, True)
         ]
 
         # Define a list of tuples with (constructor, list of constructor params) for the different kind of elements.
@@ -111,9 +123,13 @@ class EGPSWindow(QMainWindow):
         self.msg_box.addButton("Si", QMessageBox.AcceptRole)
         self.msg_box.addButton("No", QMessageBox.RejectRole)
 
-        self.err_box = QMessageBox()
-        self.err_box.setWindowTitle("Error")
-        self.err_box.setText("El archivo tiene formato incorrecto")
+        self.wrong_file_box = QMessageBox()
+        self.wrong_file_box.setWindowTitle("Error")
+        self.wrong_file_box.setText("El archivo tiene formato incorrecto")
+
+        self.no_data_box = QMessageBox()
+        self.no_data_box.setWindowTitle("Error")
+        self.no_data_box.setText("No se puede usar esa ruta o no hay datos")
 
         # Create select play file
         self.path_label = QLabel(os.path.abspath(OUTPUT_FILE_PATH), self)

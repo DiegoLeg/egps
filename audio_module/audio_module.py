@@ -1,12 +1,13 @@
 import pyaudio
+import tempfile
 import time
 import wave
 from io import BytesIO
 from threading import Thread
 
-import librosa as lb
 from scipy.signal import lfilter as lfilter
 
+import soundfile as sf
 from config import OUTPUT_FILE_PATH
 
 # No borrar esta dependencia
@@ -22,9 +23,12 @@ class AudioModule:
             channels=self.wave_in_file.getnchannels(), rate=self.wave_in_file.getframerate(),
             output=True, stream_callback=self.play_callback)
         self.in_file_stream.stop_stream()
+        self.in_wav_file_path = wav_file_path
 
+        self.out_stream = None
         self.rec_play_stream = None
         self.rec_wave = None
+        self.wave_out = None
 
         self.rec_frames = []
         self.wave_bytes = BytesIO()
@@ -45,6 +49,7 @@ class AudioModule:
         self.stop_file()
         self.wave_in_file.close()
         self.wave_in_file = wave.open(wav_file_path, "rb")
+        self.in_wav_file_path = wav_file_path
 
     def play_callback(self, in_data, frame_count, time_info, status):
         data = self.wave_in_file.readframes(frame_count)
@@ -127,45 +132,57 @@ class AudioModule:
             wave_file.close()
         return len(self.rec_frames) > 0
 
-    def process(self):
+    def play_out(self, in_num, in_den, out_num, out_den, recorded):
+        if recorded:
+            tf = tempfile.NamedTemporaryFile(suffix=".wav")
+            if self.save_rec(tf.name):
+                x, sample_rate = sf.read(tf.name)
+            else:
+                return
+        else:
+            x, sample_rate = sf.read(self.in_wav_file_path)
 
-        # Abro el archivo, y lo convierto en un array de intensidad
+        filtered = lfilter(in_num, in_den, lfilter(out_den, out_num, x))
 
-        x, samplerate = lb.load(OUTPUT_FILE_PATH, 44100)  # si no especifico este samplerate, librosa downsamplea
+        tf = tempfile.NamedTemporaryFile(suffix=".wav")
+        sf.write(tf.name, filtered, sample_rate, subtype='PCM_16')
+        self.wave_out = wave.open(tf, "rb")
 
-        # --------------------------------------------------------------------
-        # Usando lfilter
+        self.out_stream = self.py_audio.open(
+            format=self.py_audio.get_format_from_width(self.wave_in_file.getsampwidth()),
+            channels=self.wave_in_file.getnchannels(), rate=self.wave_in_file.getframerate(),
+            output=True, stream_callback=self.play_out_callback)
+        self.out_stream.stop_stream()
 
-        # Defino numerador y denominador de la funcion transferencia del mic
+        thread = Thread(target=self.play_out_thread)
+        thread.setDaemon(True)
+        thread.start()
 
-        b = [0.2844, 0.8472, 0.2055]  # numerador
-        a = [1., -0.1608, 0.5231]  # denominador
+    def save_out(self, filename, in_num, in_den, out_num, out_den, recorded):
+        if recorded:
+            tf = tempfile.NamedTemporaryFile(suffix=".wav")
+            if self.save_rec(tf.name):
+                x, sample_rate = sf.read(tf.name)
+            else:
+                return False
+        else:
+            x, sample_rate = sf.read(self.in_wav_file_path)
 
-        # ---------------------------------------------------------------------
-        # Podria usar sosfilt
+        filtered = lfilter(in_num, in_den, lfilter(out_den, out_num, x))
+        sf.write(filename, filtered, sample_rate, subtype='PCM_16')
+        return True
 
-        # sos = [a+b]
-        # sos = [[1.0, 0.004, 0.816, 1, 1.395, 0.18], [1e-06, 1.395, 0.18, 1, 0.004, 0.816]]
+    def play_out_callback(self, in_data, frame_count, time_info, status):
+        data = self.wave_out.readframes(frame_count)
+        return data, pyaudio.paContinue
 
-        # filtered = sosfilt(sos,x)
-        # y = sos2zpk(sos)           #polos y ceros del sistema
+    def stop_out(self):
+        self.out_stream.stop_stream()
 
-        # ---------------------------------------------------------------------
-
-        # Aplico primero el filtro inverso de la transferencia, y despues la transferencia de algun otro mic
-
-        filtered = lfilter(b, a, lfilter(a, b, x))
-
-        # ---------------------------------------------------------------------------
-        # Guardar en archivo
-
-        lb.output.write_wav('recfile_filtered.wav', filtered, samplerate)
-
-        # sf.write('file_trim2.wav', filtered, samplerate)
-
-        print len(x)
-        print x
-        print x.dtype
-
-        print len(filtered)
-        print filtered()
+    def play_out_thread(self):
+        if self.out_stream.is_active():
+            self.out_stream()
+            time.sleep(0.002)
+        self.out_stream.start_stream()
+        while self.out_stream.is_active():
+            time.sleep(0.001)
