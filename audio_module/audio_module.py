@@ -195,7 +195,7 @@ class AudioModule:
         Metodo para almacenar el archivo de audio que fue grabado
 
         :param wave_output_filename: Nombre del archivo que se almacena
-        :return:
+
         """
         if self.rec_frames:
 
@@ -215,7 +215,7 @@ class AudioModule:
         """
         Reproduccion de la senal de salida una vez filtrada
 
-        :param recorded:
+
         :param in_num: Numerador de la funcion de transferencia del transductor a simular
         :param in_den: Denominador de la funcion de transferencia del transductor a simular
         :param out_num: Numerador del sistema inverso correspondiente a la funcion de transferencia del transductor
@@ -288,7 +288,6 @@ class AudioModule:
         Metodo para guardar el archivo temporal .wav que fue creado
 
         :param filename: Nombre del archivo
-        :param recorded:
         :param in_num: Numerador de la funcion de transferencia del transductor a simular
         :param in_den: Denominador de la funcion de transferencia del transductor a simular
         :param out_num: Numerador del sistema inverso correspondiente a la funcion de transferencia del transductor
